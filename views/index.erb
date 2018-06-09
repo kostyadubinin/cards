@@ -1,0 +1,7 @@
+<ul>
+  <% @cards.each do |card| %>
+  <li>
+    <a href="cards/<%= card["id"] %>/back"><%= card["front"] %></a>
+  </li>
+  <% end %>
+</ul>
