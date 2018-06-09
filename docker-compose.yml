@@ -1,0 +1,17 @@
+version: "3"
+services:
+  web:
+    environment:
+      - APP_ENV=production
+      - REDIS_HOST=redis
+    image: kostyadubinin/cards
+    ports:
+      - "80:4567"
+    networks:
+      - webnet
+  redis:
+    image: redis
+    networks:
+      - webnet
+networks:
+  webnet:
