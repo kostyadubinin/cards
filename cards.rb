@@ -11,9 +11,3 @@ get "/" do
 
   erb :index
 end
-
-get "/cards/:id/back" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
-  @card = redis.hgetall("card:#{params[:id]}")
-  erb :back
-end
