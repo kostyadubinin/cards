@@ -2,14 +2,13 @@
 
 <ul>
   <% @cards.each do |card| %>
-  <li>
-    <%= card[:left] %>
     <% if params[:flip] == card[:id] %>
-    <a href="/"><%= card[:back] %></a>
+      <% href = "/" %>
+      <% text = card[:back] %>
     <% else %>
-    <a href="/?flip=<%= card[:id] %>"><%= card[:middle] %></a>
+      <% href = "/?flip=#{card[:id]}" %>
+      <% text = card[:middle] %>
     <% end %>
-    <%= card[:right] %>
-  </li>
+    <li><%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %></li>
   <% end %>
 </ul>
