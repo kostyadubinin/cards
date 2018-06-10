@@ -7,7 +7,13 @@
       <% href = "/?flip=#{card[:id]}" %>
       <% text = card[:middle] %>
     <% end %>
-    <li><%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %></li>
+    <li>
+      <form action="/cards/<%= card[:id] %>" method="post" style="display: inline">
+	<input type="hidden" name="_method" value="delete"/>
+	<input value="Delete" type="submit"/>
+      </form>
+      <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
+    </li>
   <% end %>
 </ul>
 
