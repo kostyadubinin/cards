@@ -22,3 +22,10 @@ post "/cards" do
   redis.sadd("cards", id)
   redirect "/"
 end
+
+delete "/cards/:id" do
+  redis = Redis.new(host: ENV["REDIS_HOST"])
+  redis.del("card:#{params[:id]}")
+  redis.srem("cards", params[:id])
+  redirect "/"
+end
