@@ -1,5 +1,6 @@
 require "sinatra"
 require "redis"
+require "jwt"
 
 get "/" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
