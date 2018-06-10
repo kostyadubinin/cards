@@ -15,10 +15,11 @@
       <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
     </li>
   <% end %>
+  <li>
+    <form action="/cards" method="post">
+      Front side: <input type="text" name="front" placeholder="Enjoy *life*.">
+      Translation: <input type="text" name="back" placeholder="жизнь">
+      <input type="submit" value="Add">
+    </form>
+  </li>
 </ul>
-
-<form action="/cards" method="post">
-  Front: <input type="text" name="front">
-  Back: <input type="text" name="back">
-  <input type="submit" value="Submit">
-</form>
