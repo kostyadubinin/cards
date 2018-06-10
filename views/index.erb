@@ -3,13 +3,13 @@
 <ul>
   <% @cards.each do |card| %>
   <li>
-    <% if params[:flip] == card[:id] %>
-    <%= card[:back] %>
-    <% else %>
     <%= card[:left] %>
+    <% if params[:flip] == card[:id] %>
+    <a href="/"><%= card[:back] %></a>
+    <% else %>
     <a href="/?flip=<%= card[:id] %>"><%= card[:middle] %></a>
-    <%= card[:right] %>
     <% end %>
+    <%= card[:right] %>
   </li>
   <% end %>
 </ul>
