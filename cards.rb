@@ -13,3 +13,11 @@ get "/" do
 
   erb :index
 end
+
+post "/cards" do
+  redis = Redis.new(host: ENV["REDIS_HOST"])
+  id = redis.incr(:next_card_id)
+  redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
+  redis.sadd("cards", id)
+  redirect "/"
+end

@@ -1,5 +1,3 @@
-<p>Your cards:</p>
-
 <ul>
   <% @cards.each do |card| %>
     <% if params[:flip] == card[:id] %>
@@ -12,3 +10,9 @@
     <li><%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %></li>
   <% end %>
 </ul>
+
+<form action="/cards" method="post">
+  Front: <input type="text" name="front">
+  Back: <input type="text" name="back">
+  <input type="submit" value="Submit">
+</form>
