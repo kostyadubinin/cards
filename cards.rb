@@ -1,4 +1,5 @@
 require "sinatra"
+require "sinatra/reloader" if development?
 require "redis"
 require "jwt"
 
@@ -28,4 +29,13 @@ delete "/cards/:id" do
   redis.del("card:#{params[:id]}")
   redis.srem("cards", params[:id])
   redirect "/"
+end
+
+get "/login" do
+  erb :login
+end
+
+post "/check-your-inbox" do
+  @email = params[:email]
+  erb :check_your_inbox
 end
