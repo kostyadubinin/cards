@@ -1,4 +1,5 @@
 require "sinatra"
+require "sinatra/cookies"
 require "sinatra/reloader" if development?
 require "redis"
 require "jwt"
