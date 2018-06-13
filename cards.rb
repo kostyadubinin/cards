@@ -1,6 +1,7 @@
 require "sinatra"
 require "sinatra/cookies"
 require "sinatra/reloader" if development?
+require "pry" if development?
 require "redis"
 require "jwt"
 
@@ -37,6 +38,21 @@ get "/login" do
 end
 
 post "/check-your-inbox" do
+  redis = Redis.new(host: ENV["REDIS_HOST"])
   @email = params[:email]
+
+  if redis.hexists(:users, @email)
+    id = redis.hget(:users, @email)
+    logger.info("UserId=#{id} found")
+  else
+    id = redis.incr(:next_user_id)
+    redis.hset(:users, @email, id)
+    redis.hset("user:#{id}", :email, @email)
+    logger.info("UserId=#{id} created")
+  end
+
+  # TODO: Generate a JWT token.
+  # TODO: Send a link with the token.
+
   erb :check_your_inbox
 end
