@@ -51,8 +51,9 @@ post "/check-your-inbox" do
     logger.info("UserId=#{id} created")
   end
 
-  # TODO: Generate a JWT token.
-  # TODO: Send a link with the token.
+  # TODO: Sign the token.
+  token = JWT.encode({ user_id: id }, nil, "none")
+  logger.info("token=#{token}")
 
   erb :check_your_inbox
 end
