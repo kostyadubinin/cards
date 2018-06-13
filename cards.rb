@@ -41,14 +41,14 @@ post "/check-your-inbox" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   @email = params[:email]
 
-  if redis.hexists(:users, @email)
-    id = redis.hget(:users, @email)
-    logger.info("UserId=#{id} found")
+  if redis.hexists(:emails, @email)
+    id = redis.hget(:emails, @email)
+    logger.info("userId=#{id} found")
   else
     id = redis.incr(:next_user_id)
-    redis.hset(:users, @email, id)
+    redis.hset(:emails, @email, id)
     redis.hset("user:#{id}", :email, @email)
-    logger.info("UserId=#{id} created")
+    logger.info("userId=#{id} created")
   end
 
   # TODO: Sign the token.
@@ -56,4 +56,12 @@ post "/check-your-inbox" do
   logger.info("token=#{token}")
 
   erb :check_your_inbox
+end
+
+get "/login-finish" do
+  token = params[:token]
+  decoded_token = JWT.decode(token, nil, false)
+  logger.info("decodedToken=#{decoded_token}")
+  id = decoded_token[0]["user_id"]
+  logger.info("userId=#{id}")
 end
