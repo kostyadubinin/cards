@@ -6,6 +6,15 @@ require "redis"
 require "jwt"
 
 get "/" do
+  logger.info("cookies=#{cookies.to_hash}")
+
+  if (token = cookies[:token])
+    decoded_token = JWT.decode(token, nil, false)
+    logger.info("decodedToken=#{decoded_token}")
+    user_id = decoded_token[0]["user_id"]
+    logger.info("userId=#{user_id}")
+  end
+
   redis = Redis.new(host: ENV["REDIS_HOST"])
   card_ids = redis.smembers(:cards)
 
@@ -59,9 +68,6 @@ post "/check-your-inbox" do
 end
 
 get "/login-finish" do
-  token = params[:token]
-  decoded_token = JWT.decode(token, nil, false)
-  logger.info("decodedToken=#{decoded_token}")
-  id = decoded_token[0]["user_id"]
-  logger.info("userId=#{id}")
+  cookies[:token] = params[:token]
+  redirect "/"
 end
