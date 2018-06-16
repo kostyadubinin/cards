@@ -9,6 +9,10 @@ get "/" do
   logger.info("cookies=#{cookies.to_hash}")
 
   if (token = cookies[:token])
+    # TODO: Handle JWT::DecodeError:
+    #  - token is empty
+    #  - token is missing
+    #  - token is unvalid
     decoded_token = JWT.decode(token, nil, false)
     logger.info("decodedToken=#{decoded_token}")
     user_id = decoded_token[0]["user_id"]
