@@ -6,17 +6,15 @@ require "redis"
 require "jwt"
 
 get "/" do
-  logger.info("cookies=#{cookies.to_hash}")
+  token = cookies[:token]
+  logger.info("token=#{token.inspect}")
 
-  if (token = cookies[:token])
-    # TODO: Handle JWT::DecodeError:
-    #  - token is empty
-    #  - token is missing
-    #  - token is unvalid
+  if !token.nil? && token != ""
+    # TODO: Handle JWT::DecodeError: when token is unvalid.
     decoded_token = JWT.decode(token, nil, false)
-    logger.info("decodedToken=#{decoded_token}")
+    logger.info("decodedToken=#{decoded_token.inspect}")
     user_id = decoded_token[0]["user_id"]
-    logger.info("userId=#{user_id}")
+    logger.info("userId=#{user_id.inspect}")
   end
 
   redis = Redis.new(host: ENV["REDIS_HOST"])
@@ -56,17 +54,17 @@ post "/check-your-inbox" do
 
   if redis.hexists(:emails, @email)
     id = redis.hget(:emails, @email)
-    logger.info("userId=#{id} found")
+    logger.info("userId=#{id.inspect} found")
   else
     id = redis.incr(:next_user_id)
     redis.hset(:emails, @email, id)
     redis.hset("user:#{id}", :email, @email)
-    logger.info("userId=#{id} created")
+    logger.info("userId=#{id.inspect} created")
   end
 
   # TODO: Sign the token.
   token = JWT.encode({ user_id: id }, nil, "none")
-  logger.info("token=#{token}")
+  logger.info("token=#{token.inspect}")
 
   erb :check_your_inbox
 end
