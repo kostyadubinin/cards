@@ -9,12 +9,13 @@ get "/" do
   token = cookies[:token]
   logger.info("token=#{token.inspect}")
 
-  if !token.nil? && token != ""
-    # TODO: Handle JWT::DecodeError: when token is unvalid.
+  begin
     decoded_token = JWT.decode(token, nil, false)
     logger.info("decodedToken=#{decoded_token.inspect}")
     user_id = decoded_token[0]["user_id"]
     logger.info("userId=#{user_id.inspect}")
+  rescue JWT::DecodeError => e
+    logger.info("error=#{e.class} message=\"#{e.message}\"")
   end
 
   redis = Redis.new(host: ENV["REDIS_HOST"])
@@ -41,6 +42,7 @@ delete "/cards/:id" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   redis.del("card:#{params[:id]}")
   redis.srem("cards", params[:id])
+  # TODO: Use `redirect to('/bar')`.
   redirect "/"
 end
 
