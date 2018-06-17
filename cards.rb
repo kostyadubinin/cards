@@ -5,19 +5,34 @@ require "pry" if development?
 require "redis"
 require "jwt"
 
-get "/" do
-  token = cookies[:token]
-  logger.info("token=#{token.inspect}")
+helpers do
+  def current_user_id
+    token = cookies[:token]
+    logger.info("token=#{token.inspect}")
 
-  begin
-    decoded_token = JWT.decode(token, nil, false)
-    logger.info("decodedToken=#{decoded_token.inspect}")
-    user_id = decoded_token[0]["user_id"]
-    logger.info("userId=#{user_id.inspect}")
-  rescue JWT::DecodeError => e
-    logger.info("error=#{e.class} message=\"#{e.message}\"")
+    return if token.nil?
+    return if token == ""
+
+    begin
+      redis = Redis.new(host: ENV["REDIS_HOST"])
+      decoded_token = JWT.decode(token, nil, false)
+      logger.info("decodedToken=#{decoded_token.inspect}")
+      user_id = decoded_token[0]["user_id"]
+
+      if redis.exists("user:#{user_id}")
+        id = user_id
+      end
+
+      logger.info("currentUserId=#{id.inspect}")
+
+      id
+    rescue JWT::DecodeError => e
+      logger.info("error=#{e.class} message=\"#{e.message}\"")
+    end
   end
+end
 
+get "/" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   card_ids = redis.smembers(:cards)
 
