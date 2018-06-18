@@ -11,21 +11,15 @@ helpers do
     logger.info("token=#{token.inspect}")
 
     unless token.nil?
-      id = begin
-             redis = Redis.new(host: ENV["REDIS_HOST"])
-             decoded_token = JWT.decode(token, nil, false)
-             logger.info("decodedToken=#{decoded_token.inspect}")
-             user_id = decoded_token[0]["user_id"]
-
-             id if redis.exists("user:#{user_id}")
-           rescue JWT::DecodeError => e
-             logger.info("error=#{e.inspect}")
-             nil
-           end
+      decoded_token = JWT.decode(token, nil, false)
+      logger.info("decodedToken=#{decoded_token.inspect}")
+      uid = decoded_token[0]["uid"]
+      redis = Redis.new(host: ENV["REDIS_HOST"])
+      user_id = uid if redis.exists("user:#{uid}")
     end
 
-    logger.info("currentUserId=#{id.inspect}")
-    id
+    logger.info("currentUserId=#{user_id.inspect}")
+    user_id
   end
 end
 
