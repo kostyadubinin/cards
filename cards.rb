@@ -48,14 +48,14 @@ post "/cards" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
-  redis.sadd("cards", id)
+  redis.sadd("user:#{current_user_id}:cards", id)
   redirect "/"
 end
 
 delete "/cards/:id" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   redis.del("card:#{params[:id]}")
-  redis.srem("cards", params[:id])
+  redis.srem("user:#{current_user_id}:cards", params[:id])
   # TODO: Use `redirect to('/bar')`.
   redirect "/"
 end
