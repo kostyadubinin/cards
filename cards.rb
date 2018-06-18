@@ -11,7 +11,7 @@ helpers do
     logger.info("token=#{token.inspect}")
 
     unless token.nil?
-      decoded_token = JWT.decode(token, nil, false)
+      decoded_token = JWT.decode(token, ENV["SECRET"], true, { algorithm: "HS256" })
       logger.info("decodedToken=#{decoded_token.inspect}")
       uid = decoded_token[0]["uid"]
       redis = Redis.new(host: ENV["REDIS_HOST"])
