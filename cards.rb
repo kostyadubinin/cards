@@ -5,6 +5,10 @@ require "pry" if development?
 require "redis"
 require "jwt"
 
+error do
+  env["sinatra.error"].message
+end
+
 helpers do
   def current_user_id
     token = cookies[:token]
@@ -21,12 +25,17 @@ helpers do
     logger.info("currentUserId=#{user_id.inspect}")
     user_id
   end
+
+
+  def authenticate!
+    raise "Unauthenticated" if current_user_id.nil?
+  end
 end
 
 get "/" do
-  current_user_id
+  authenticate!
   redis = Redis.new(host: ENV["REDIS_HOST"])
-  card_ids = redis.smembers(:cards)
+  card_ids = redis.smembers("user:#{current_user_id}:cards")
 
   @cards = card_ids.map do |id|
     card = redis.hgetall("card:#{id}").merge("id" => id)
