@@ -6,6 +6,7 @@ require "redis"
 require "jwt"
 
 # TODO: Handle CSRF.
+# TODO: Test cookies in production (domain, path, secure?, etc.).
 
 before do
   if current_user_id.nil?
