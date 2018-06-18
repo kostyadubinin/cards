@@ -5,8 +5,12 @@ require "pry" if development?
 require "redis"
 require "jwt"
 
-error do
-  env["sinatra.error"].message
+# TODO: Handle CSRF.
+
+before do
+  if current_user_id.nil?
+    halt "Access denied, please login."
+  end
 end
 
 helpers do
@@ -25,15 +29,9 @@ helpers do
     logger.info("currentUserId=#{user_id.inspect}")
     user_id
   end
-
-
-  def authenticate!
-    raise "Unauthenticated" if current_user_id.nil?
-  end
 end
 
 get "/" do
-  authenticate!
   redis = Redis.new(host: ENV["REDIS_HOST"])
   card_ids = redis.smembers("user:#{current_user_id}:cards")
 
