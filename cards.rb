@@ -9,6 +9,8 @@ require "jwt"
 # TODO: Test cookies in production (domain, path, secure?, etc.).
 
 before do
+  # cookies[:token] = JWT.encode({ uid: 1 }, ENV["SECRET"], "HS256")
+
   if current_user_id.nil?
     halt "Access denied, please login."
   end
