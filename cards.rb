@@ -75,6 +75,7 @@ post "/cards" do
   redirect "/"
 end
 
+# TODO: Delete own cards only.
 delete "/cards/:id" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   redis.del("card:#{params[:id]}")
