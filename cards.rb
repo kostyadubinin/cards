@@ -37,7 +37,7 @@ get "/" do
   card_ids = redis.smembers("user:#{current_user_id}:cards")
 
   @cards = card_ids.map do |id|
-    card = redis.hgetall("card:#{id}").merge("id" => id)
+    card = redis.hgetall("card:#{id}")
     left, middle, right = card["front"].split("*")
     { id: id, left: left, middle: middle, right: right, back: card["back"] }
   end
