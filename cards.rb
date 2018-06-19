@@ -49,7 +49,7 @@ end
 
 get "/cards" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
-  card_ids = redis.smembers("user:#{current_user_id}:cards")
+  card_ids = redis.zrevrange("user:#{current_user_id}:cards", 0, -1)
 
   @cards = card_ids.map do |id|
     card = redis.hgetall("card:#{id}")
@@ -69,7 +69,7 @@ end
 get "/cards/:id" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
 
-  unless redis.sismember("user:#{current_user_id}:cards", params[:id])
+  unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
 
@@ -83,7 +83,7 @@ end
 post "/current-cards" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
 
-  unless redis.sismember("user:#{current_user_id}:cards", params[:id])
+  unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
 
@@ -94,7 +94,7 @@ end
 delete "/current-cards" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
 
-  unless redis.sismember("user:#{current_user_id}:cards", params[:id])
+  unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
 
@@ -106,18 +106,18 @@ post "/cards" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
-  redis.sadd("user:#{current_user_id}:cards", id)
+  redis.zadd("user:#{current_user_id}:cards", Time.now.to_i, id)
   redirect "/cards"
 end
 
 delete "/cards/:id" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
 
-  unless redis.sismember("user:#{current_user_id}:cards", params[:id])
+  unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
 
-  redis.srem("user:#{current_user_id}:cards", params[:id])
+  redis.zrem("user:#{current_user_id}:cards", params[:id])
   redis.srem("user:#{current_user_id}:current-cards", params[:id])
   redis.del("card:#{params[:id]}")
   # TODO: Use `redirect to('/bar')`.
