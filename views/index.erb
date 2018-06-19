@@ -1,5 +1,5 @@
 <p>
-  Home | <a href="/cards/random">Random card</a>
+  Home | <a href="/cards/random">Random card</a> | <a href="/cards">All cards</a>
 </p>
 
 <ul>
@@ -11,19 +11,13 @@
       <% href = "/?flip=#{card[:id]}" %>
       <% text = card[:middle] %>
     <% end %>
-    <li>
-      <form action="/cards/<%= card[:id] %>" method="post" style="display: inline">
-	<input type="hidden" name="_method" value="delete"/>
-	<input value="Delete" type="submit"/>
-      </form>
-      <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
-    </li>
-  <% end %>
   <li>
-    <form action="/cards" method="post">
-      Front side: <input type="text" name="front" placeholder="Enjoy *life*.">
-      Translation: <input type="text" name="back" placeholder="жизнь">
-      <input type="submit" value="Add">
+    <form action="/current-cards" method="post" style="display: inline">
+      <input type="hidden" name="_method" value="delete"/>
+      <input type="hidden" name="id" value="<%= card[:id] %>">
+      <input value="Remove" type="submit"/>
     </form>
+    <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
   </li>
+  <% end %>
 </ul>

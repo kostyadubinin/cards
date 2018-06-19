@@ -1,0 +1,36 @@
+<p>
+  <a href="/">Home</a> | <a href="/cards/random">Random card</a> | All cards
+</p>
+
+<h2>Create new card</h2>
+
+<form action="/cards" method="post">
+  Front side: <input type="text" name="front" placeholder="Enjoy *life*.">
+  Translation: <input type="text" name="back" placeholder="жизнь">
+  <input type="submit" value="Create">
+</form>
+
+<h2>Your cards</h2>
+
+<ul>
+  <% @cards.each do |card| %>
+    <% if params[:flip] == card[:id] %>
+      <% href = "/cards" %>
+      <% text = card[:back] %>
+    <% else %>
+      <% href = "/cards?flip=#{card[:id]}" %>
+      <% text = card[:middle] %>
+    <% end %>
+    <li>
+      <form action="/cards/<%= card[:id] %>" method="post" style="display: inline">
+	<input type="hidden" name="_method" value="delete"/>
+	<input value="Delete" type="submit"/>
+      </form>
+      <form action="/current-cards" method="post" style="display: inline">
+	<input type="hidden" name="id" value="<%= card[:id] %>">
+	<input type="submit" value="Add to learning cards">
+      </form>
+      <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
+    </li>
+  <% end %>
+</ul>

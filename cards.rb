@@ -36,7 +36,7 @@ end
 
 get "/" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
-  card_ids = redis.smembers("user:#{current_user_id}:cards")
+  card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
     card = redis.hgetall("card:#{id}")
@@ -47,9 +47,22 @@ get "/" do
   erb :index
 end
 
+get "/cards" do
+  redis = Redis.new(host: ENV["REDIS_HOST"])
+  card_ids = redis.smembers("user:#{current_user_id}:cards")
+
+  @cards = card_ids.map do |id|
+    card = redis.hgetall("card:#{id}")
+    left, middle, right = card["front"].split("*")
+    { id: id, left: left, middle: middle, right: right, back: card["back"] }
+  end
+
+  erb :cards
+end
+
 get "/cards/random" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
-  id = redis.srandmember("user:#{current_user_id}:cards")
+  id = redis.srandmember("user:#{current_user_id}:current-cards")
   redirect "/cards/#{id}"
 end
 
@@ -67,19 +80,46 @@ get "/cards/:id" do
   erb :card
 end
 
+post "/current-cards" do
+  redis = Redis.new(host: ENV["REDIS_HOST"])
+
+  unless redis.sismember("user:#{current_user_id}:cards", params[:id])
+    halt "Card not found"
+  end
+
+  redis.sadd("user:#{current_user_id}:current-cards", params[:id])
+  redirect "/cards"
+end
+
+delete "/current-cards" do
+  redis = Redis.new(host: ENV["REDIS_HOST"])
+
+  unless redis.sismember("user:#{current_user_id}:cards", params[:id])
+    halt "Card not found"
+  end
+
+  redis.srem("user:#{current_user_id}:current-cards", params[:id])
+  redirect "/"
+end
+
 post "/cards" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
   redis.sadd("user:#{current_user_id}:cards", id)
-  redirect "/"
+  redirect "/cards"
 end
 
-# TODO: Delete own cards only.
 delete "/cards/:id" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
-  redis.del("card:#{params[:id]}")
+
+  unless redis.sismember("user:#{current_user_id}:cards", params[:id])
+    halt "Card not found"
+  end
+
   redis.srem("user:#{current_user_id}:cards", params[:id])
+  redis.srem("user:#{current_user_id}:current-cards", params[:id])
+  redis.del("card:#{params[:id]}")
   # TODO: Use `redirect to('/bar')`.
-  redirect "/"
+  redirect "/cards"
 end
