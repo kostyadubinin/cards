@@ -1,0 +1,11 @@
+<p>
+  <a href="/">Home</a> | <a href="/cards/random">Random card</a>
+</p>
+
+<h1>
+  <% if params.key?(:flip) %>
+  <a href="?"><%= @card[:back] %></a>
+  <% else %>
+  <a href="?flip"><%= @card[:middle] %></a>
+  <% end %>
+</h1>

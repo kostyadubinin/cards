@@ -47,6 +47,26 @@ get "/" do
   erb :index
 end
 
+get "/cards/random" do
+  redis = Redis.new(host: ENV["REDIS_HOST"])
+  id = redis.srandmember("user:#{current_user_id}:cards")
+  redirect "/cards/#{id}"
+end
+
+get "/cards/:id" do
+  redis = Redis.new(host: ENV["REDIS_HOST"])
+
+  unless redis.sismember("user:#{current_user_id}:cards", params[:id])
+    halt "Card not found"
+  end
+
+  card = redis.hgetall("card:#{params[:id]}")
+  left, middle, right = card["front"].split("*")
+  @card = { id: params[:id], left: left, middle: middle, right: right, back: card["back"] }
+
+  erb :card
+end
+
 post "/cards" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   id = redis.incr(:next_card_id)
