@@ -13,9 +13,12 @@
     <% end %>
   <li>
     <form action="/current-cards" method="post" style="display: inline">
-      <input type="hidden" name="_method" value="delete"/>
+      <input type="hidden" name="_method" value="delete">
       <input type="hidden" name="id" value="<%= card[:id] %>">
-      <input value="Remove" type="submit"/>
+      <input value="Remove" type="submit">
+    </form>
+    <form action="/cards/<%= card[:id] %>" method="get" style="display: inline">
+      <input value="Open" type="submit">
     </form>
     <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
   </li>
