@@ -34,6 +34,10 @@ helpers do
   end
 end
 
+get "/styles.css" do
+  scss :styles
+end
+
 get "/" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
