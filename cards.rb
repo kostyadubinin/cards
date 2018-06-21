@@ -15,6 +15,10 @@ before do
 end
 
 helpers do
+  def redis
+    @_redis ||= Redis.new(host: ENV["REDIS_HOST"])
+  end
+
   def current_user_id
     token = cookies[:token]
     logger.info("token=#{token.inspect}")
@@ -23,7 +27,6 @@ helpers do
       decoded_token = JWT.decode(token, ENV["SECRET"], true, { algorithm: "HS256" })
       logger.info("decodedToken=#{decoded_token.inspect}")
       uid = decoded_token[0]["uid"]
-      redis = Redis.new(host: ENV["REDIS_HOST"])
       user_id = uid if redis.exists("user:#{uid}")
     end
 
@@ -37,7 +40,6 @@ get "/styles.css" do
 end
 
 get "/" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
@@ -50,7 +52,6 @@ get "/" do
 end
 
 get "/cards" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
   card_ids = redis.zrevrange("user:#{current_user_id}:cards", 0, -1)
 
   @cards = card_ids.map do |id|
@@ -63,14 +64,11 @@ get "/cards" do
 end
 
 get "/cards/random" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
   id = redis.srandmember("user:#{current_user_id}:current-cards")
   redirect to("/cards/#{id}")
 end
 
 get "/cards/:id" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
-
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -83,8 +81,6 @@ get "/cards/:id" do
 end
 
 post "/current-cards" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
-
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -94,8 +90,6 @@ post "/current-cards" do
 end
 
 delete "/current-cards" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
-
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -105,7 +99,6 @@ delete "/current-cards" do
 end
 
 post "/cards" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
   redis.zadd("user:#{current_user_id}:cards", Time.now.to_i, id)
@@ -113,8 +106,6 @@ post "/cards" do
 end
 
 delete "/cards/:id" do
-  redis = Redis.new(host: ENV["REDIS_HOST"])
-
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
