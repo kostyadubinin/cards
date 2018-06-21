@@ -6,8 +6,6 @@ require "redis"
 require "jwt"
 
 # TODO: Handle CSRF.
-# TODO: Test cookies in production (domain, path, secure?, etc.).
-
 before do
   # cookies[:token] = JWT.encode({ uid: 1 }, ENV["SECRET"], "HS256")
 
