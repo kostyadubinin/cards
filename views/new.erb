@@ -1,0 +1,20 @@
+<p>
+  <a href="/">Home</a> | <a href="/cards/random">Random</a> | New card | <a href="/cards">Manage</a>
+</p>
+
+<h2>Create new card</h2>
+
+<div>
+<form action="/cards" method="post">
+  Front side:
+  <br>
+  <input type="text" required="required" name="front" placeholder="Enjoy *life*" autocomplete="off" autofocus="autofocus" pattern=".*\*.*\*.*" title="*Surround* the word you want to learn with asterisks" style="width: 100%">
+  <br>
+  Translation:
+  <br>
+  <input type="text" required="required" name="back" placeholder="жизнь" autocomplete="off" style="width: 100%">
+  <br>
+  <br>
+  <input type="submit" value="Create">
+</form>
+</div>

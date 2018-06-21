@@ -39,6 +39,10 @@ get "/styles.css" do
   scss :styles
 end
 
+get "/cards/new" do
+  erb :new
+end
+
 get "/" do
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
