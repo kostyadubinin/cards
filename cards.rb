@@ -67,7 +67,7 @@ end
 get "/cards/random" do
   redis = Redis.new(host: ENV["REDIS_HOST"])
   id = redis.srandmember("user:#{current_user_id}:current-cards")
-  redirect "/cards/#{id}"
+  redirect to("/cards/#{id}")
 end
 
 get "/cards/:id" do
@@ -92,7 +92,7 @@ post "/current-cards" do
   end
 
   redis.sadd("user:#{current_user_id}:current-cards", params[:id])
-  redirect "/cards"
+  redirect to("/cards")
 end
 
 delete "/current-cards" do
@@ -103,7 +103,7 @@ delete "/current-cards" do
   end
 
   redis.srem("user:#{current_user_id}:current-cards", params[:id])
-  redirect "/"
+  redirect to("/")
 end
 
 post "/cards" do
@@ -111,7 +111,7 @@ post "/cards" do
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
   redis.zadd("user:#{current_user_id}:cards", Time.now.to_i, id)
-  redirect "/cards"
+  redirect to("/cards")
 end
 
 delete "/cards/:id" do
@@ -124,6 +124,5 @@ delete "/cards/:id" do
   redis.zrem("user:#{current_user_id}:cards", params[:id])
   redis.srem("user:#{current_user_id}:current-cards", params[:id])
   redis.del("card:#{params[:id]}")
-  # TODO: Use `redirect to('/bar')`.
-  redirect "/cards"
+  redirect to("/cards")
 end
