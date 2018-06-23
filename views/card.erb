@@ -13,3 +13,8 @@
 <p>
   Look it up in: <a target="_blank" href="https://dictionary.cambridge.org/search/learner-english/direct/?q=<%= @card[:middle] %>">Cambridge Dictionary</a> | <a target="_blank" href="https://translate.google.nl/#auto/ru/<%= @card[:middle] %>">Google Translate</a>
 </p>
+
+<form action="/cards/<%= @card[:id] %>" method="post">
+  <input type="hidden" name="_method" value="delete"/>
+  <input value="Delete" type="submit"/>
+</form>
