@@ -20,9 +20,9 @@
       </form>
       <form action="/current-cards" method="post" style="display: inline">
 	<input type="hidden" name="id" value="<%= card[:id] %>">
-	<input type="submit" value="Add to learning cards">
+	<input type="submit" value="Learn">
       </form>
-      <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
+      <a href=<%= href %>><%= text %></a>
     </li>
   <% end %>
 </ul>
