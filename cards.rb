@@ -94,7 +94,7 @@ post "/current-cards" do
   redirect to("/cards")
 end
 
-delete "/current-cards" do
+delete "/current-cards/:id" do
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end

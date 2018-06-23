@@ -14,9 +14,8 @@
       <% text = card[:middle] %>
     <% end %>
   <li>
-    <form action="/current-cards" method="post" style="display: inline">
+    <form action="/current-cards/<%= card[:id] %>" method="post" style="display: inline">
       <input type="hidden" name="_method" value="delete">
-      <input type="hidden" name="id" value="<%= card[:id] %>">
       <input value="Remove" type="submit">
     </form>
     <form action="/cards/<%= card[:id] %>" method="get" style="display: inline">
