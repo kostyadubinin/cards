@@ -57,11 +57,12 @@ end
 
 get "/cards" do
   card_ids = redis.zrevrange("user:#{current_user_id}:cards", 0, -1)
+  current_card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
     card = redis.hgetall("card:#{id}")
     left, middle, right = card["front"].split("*")
-    { id: id, left: left, middle: middle, right: right, back: card["back"] }
+    { id: id, left: left, middle: middle, right: right, back: card["back"], current: current_card_ids.include?(id) }
   end
 
   erb :cards

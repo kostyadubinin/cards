@@ -20,7 +20,7 @@
       </form>
       <form action="/current-cards" method="post" style="display: inline">
 	<input type="hidden" name="id" value="<%= card[:id] %>">
-	<input type="submit" value="Learn">
+	<input type="submit"<%= 'disabled="disabled"' if card[:current] %> value="Learn">
       </form>
       <a href=<%= href %>><%= text %></a>
     </li>
