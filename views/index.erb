@@ -2,7 +2,9 @@
   Home | <a href="/cards/random">Random</a> | <a href="/cards/new">New card</a> | <a href="/cards">Manage</a>
 </p>
 
-<ul>
+<h2>Cards you are currently learning</h2>
+
+<ol>
   <% @cards.each do |card| %>
     <% if params[:flip] == card[:id] %>
       <% href = "/" %>
@@ -23,4 +25,4 @@
     <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
   </li>
   <% end %>
-</ul>
+</ol>
