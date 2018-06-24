@@ -12,7 +12,7 @@ before do
   pass if request.path_info == "/styles.css"
 
   if current_user_id.nil?
-    halt "Access denied, please login."
+    redirect("/login")
   end
 end
 
@@ -148,6 +148,7 @@ delete "/cards/:id" do
 end
 
 get "/login" do
+  redirect to("/") if !current_user_id.nil?
   erb :login
 end
 
