@@ -6,8 +6,10 @@ require "redis"
 require "jwt"
 
 # TODO: Handle CSRF.
+# TODO: Don't log tokens.
 before do
-  # cookies[:token] = JWT.encode({ uid: 1 }, ENV["SECRET"], "HS256")
+  pass if request.path_info == "/login"
+  pass if request.path_info == "/styles.css"
 
   if current_user_id.nil?
     halt "Access denied, please login."
@@ -143,6 +145,23 @@ delete "/cards/:id" do
   redis.srem("user:#{current_user_id}:current-cards", params[:id])
   redis.del("card:#{params[:id]}")
   redirect to("/cards")
+end
+
+get "/login" do
+  erb :login
+end
+
+post "/login" do
+  user_id = redis.hget("users", params[:email])
+
+  if !user_id.nil?
+    token = JWT.encode({ uid: user_id }, ENV["SECRET"], "HS256")
+    logger.info("token=#{token.inspect}")
+  else
+    logger.info("email=#{params[:email].inspect} doesn't exist")
+  end
+
+  redirect to("/")
 end
 
 delete "/logout" do
