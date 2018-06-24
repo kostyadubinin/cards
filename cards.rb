@@ -144,3 +144,8 @@ delete "/cards/:id" do
   redis.del("card:#{params[:id]}")
   redirect to("/cards")
 end
+
+post "/logout" do
+  cookies.delete(:token)
+  redirect to("/")
+end
