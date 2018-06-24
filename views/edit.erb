@@ -1,0 +1,19 @@
+<p>
+  <a href="/">Home</a> | <a href="/cards/random">Random</a> | <a href="/cards/new">New card</a> | <a href="/cards">Manage</a>
+</p>
+
+<h2>Edit card</h2>
+
+<form action="/cards/<%= @card[:id] %>" method="post">
+  <input type="hidden" name="_method" value="patch">
+  Front side:
+  <br>
+  <input type="text" required="required" name="front" value="<%= @card[:front] %>" autocomplete="off" pattern=".*\*.*\*.*" title="*Surround* the word you want to learn with asterisks" style="width: 100%">
+  <br>
+  Translation:
+  <br>
+  <input type="text" required="required" name="back" value="<%= @card[:back] %>" autocomplete="off" style="width: 100%">
+  <br>
+  <br>
+  <input type="submit" value="Update">
+</form>

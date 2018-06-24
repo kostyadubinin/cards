@@ -85,6 +85,26 @@ get "/cards/:id" do
   erb :card
 end
 
+get "/cards/:id/edit" do
+  unless redis.zrank("user:#{current_user_id}:cards", params[:id])
+    halt "Card not found"
+  end
+
+  card = redis.hgetall("card:#{params[:id]}")
+  @card = { id: params[:id], front: card["front"], back: card["back"] }
+
+  erb :edit
+end
+
+patch "/cards/:id" do
+  unless redis.zrank("user:#{current_user_id}:cards", params[:id])
+    halt "Card not found"
+  end
+
+  redis.hmset("card:#{params[:id]}", "front", params[:front], "back", params[:back])
+  redirect to("/cards/#{params[:id]}")
+end
+
 post "/current-cards" do
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
