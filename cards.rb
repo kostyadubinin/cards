@@ -145,7 +145,7 @@ delete "/cards/:id" do
   redirect to("/cards")
 end
 
-post "/logout" do
+delete "/logout" do
   cookies.delete(:token)
   redirect to("/")
 end

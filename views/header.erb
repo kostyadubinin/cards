@@ -1,4 +1,8 @@
-<p>
-  <a href="/">Home</a> | <a href="/cards/random">Random</a> | <a href="/cards/new">New card</a> | <a href="/cards">Manage</a>
-  <i style="float: right"><%= current_user_email %></i>
-</p>
+<a href="/">Home</a> | <a href="/cards/random">Random</a> | <a href="/cards/new">New card</a> | <a href="/cards">Manage</a>
+<span style="float: right">
+  <i><%= current_user_email %></i>
+  <form action="/logout" method="post" style="display: inline">
+    <input type="hidden" name="_method" value="delete">
+    <input value="Log out" type="submit">
+  </form>
+</span>
