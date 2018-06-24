@@ -18,6 +18,9 @@
 	<input type="hidden" name="id" value="<%= card[:id] %>">
 	<input type="submit"<%= 'disabled="disabled"' if card[:current] %> value="Learn">
       </form>
+      <form action="/cards/<%= card[:id] %>" method="get" style="display: inline">
+	<input value="Open" type="submit">
+      </form>
       <a href=<%= href %>><%= text %></a>
     </li>
   <% end %>
