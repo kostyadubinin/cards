@@ -19,6 +19,10 @@ helpers do
     @_redis ||= Redis.new(host: ENV["REDIS_HOST"])
   end
 
+  def current_user_email
+    @_current_user_email ||= redis.hget("user:#{current_user_id}", :email)
+  end
+
   def current_user_id
     token = cookies[:token]
     logger.info("token=#{token.inspect}")
