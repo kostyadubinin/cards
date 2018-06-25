@@ -27,16 +27,16 @@ helpers do
 
   def current_user_id
     token = cookies[:token]
-    logger.info("token=#{token.inspect}")
+    logger.info({ token: token }.to_json)
 
     unless token.nil?
       decoded_token = JWT.decode(token, ENV["SECRET"], true, { algorithm: "HS256" })
-      logger.info("decodedToken=#{decoded_token.inspect}")
+      logger.info({ decodedToken: decoded_token }.to_json)
       uid = decoded_token[0]["uid"]
       user_id = uid if redis.exists("user:#{uid}")
     end
 
-    logger.info("currentUserId=#{user_id.inspect}")
+    logger.info({ currentUserId: user_id }.to_json)
     user_id
   end
 end
@@ -157,9 +157,9 @@ post "/login" do
 
   if !user_id.nil?
     token = JWT.encode({ uid: user_id }, ENV["SECRET"], "HS256")
-    logger.info("token=#{token.inspect}")
+    logger.info({ token: token }.to_json)
   else
-    logger.info("email=#{params[:email].inspect} doesn't exist")
+    logger.info({ error: "emailDoesNotExist", email: params[:email] }.to_json)
   end
 
   redirect to("/")
