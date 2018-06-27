@@ -1,5 +1,6 @@
 require "sinatra"
 require "sinatra/cookies"
+require "sinatra/content_for"
 require "sinatra/reloader" if development?
 require "pry" if development?
 require "redis"
