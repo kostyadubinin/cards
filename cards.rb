@@ -98,7 +98,8 @@ get "/cards/:id/edit" do
   end
 
   card = redis.hgetall("card:#{params[:id]}")
-  @card = { id: params[:id], front: card["front"], back: card["back"] }
+  _, middle, _ = card["front"].split("*")
+  @card = { id: params[:id], front: card["front"], back: card["back"], middle: middle }
 
   erb :edit
 end
