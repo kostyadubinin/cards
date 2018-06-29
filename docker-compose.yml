@@ -1,9 +1,12 @@
-version: "3"
+version: "3.1"
 services:
   web:
     environment:
-      - APP_ENV=production
-      - REDIS_HOST=redis
+      APP_ENV: production
+      REDIS_HOST: redis
+      SECRET: /run/secrets/secret
+    secrets:
+      - secret
     image: kostyadubinin/cards
     ports:
       - "80:4567"
@@ -15,3 +18,6 @@ services:
       - webnet
 networks:
   webnet:
+secrets:
+   secret:
+     external: true
