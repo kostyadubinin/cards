@@ -18,6 +18,10 @@ before do
 end
 
 helpers do
+  def secret
+    @secret ||= File.read(ENV["SECRET"])
+  end
+
   def redis
     @_redis ||= Redis.new(host: ENV["REDIS_HOST"])
   end
@@ -31,7 +35,7 @@ helpers do
     logger.info({ token: token }.to_json)
 
     unless token.nil?
-      decoded_token = JWT.decode(token, ENV["SECRET"], true, { algorithm: "HS256" })
+      decoded_token = JWT.decode(token, secret, true, { algorithm: "HS256" })
       logger.info({ decodedToken: decoded_token }.to_json)
       uid = decoded_token[0]["uid"]
       user_id = uid if redis.exists("user:#{uid}")
@@ -158,7 +162,7 @@ post "/login" do
   user_id = redis.hget("users", params[:email])
 
   if !user_id.nil?
-    token = JWT.encode({ uid: user_id }, ENV["SECRET"], "HS256")
+    token = JWT.encode({ uid: user_id }, secret, "HS256")
     logger.info({ token: token }.to_json)
   else
     logger.info({ error: "emailDoesNotExist", email: params[:email] }.to_json)
