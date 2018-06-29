@@ -22,5 +22,5 @@
 
 <form action="/cards/<%= @card[:id] %>" method="post" style="display: inline">
   <input type="hidden" name="_method" value="delete">
-  <input value="Delete" type="submit">
+  <input value="Delete" type="submit" onclick="return confirm('Are you sure?');">
 </form>
