@@ -72,7 +72,6 @@ get "/cards" do
 
   @cards = card_ids.map do |id|
     card = redis.hgetall("card:#{id}")
-    logger.info({ cardId: id, front: card["front"] }.to_json)
     left, middle, right = card["front"].split("*")
     { id: id, left: left, middle: middle, right: right, back: card["back"], current: current_card_ids.include?(id) }
   end
