@@ -9,7 +9,6 @@ require "jwt"
 # TODO: Handle CSRF.
 # TODO: Don't log tokens.
 before do
-  logger.info({ env: ENV.to_hash }.to_json)
   pass if request.path_info == "/login"
   pass if request.path_info == "/styles.css"
 
