@@ -9,7 +9,7 @@ services:
       - secret
     image: kostyadubinin/cards
     ports:
-      - "80:4567"
+      - "80:9292"
     networks:
       - webnet
   redis:
