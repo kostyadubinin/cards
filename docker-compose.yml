@@ -2,6 +2,7 @@ version: "3.1"
 services:
   web:
     environment:
+      RACK_ENV: none
       APP_ENV: production
       REDIS_HOST: redis
       SECRET: /run/secrets/secret
