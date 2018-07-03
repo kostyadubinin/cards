@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.2"
 services:
   web:
     environment:
@@ -6,8 +6,12 @@ services:
       APP_ENV: production
       REDIS_HOST: redis
       SECRET: /run/secrets/secret
+      SSL_KEY_PATH: /run/secrets/ssl_key_path
+      SSL_CERT_PATH: /run/secrets/ssl_cert_path
     secrets:
       - secret
+      - ssl_key_path
+      - ssl_cert_path
     image: kostyadubinin/cards
     ports:
       - "80:9292"
@@ -15,10 +19,16 @@ services:
       - webnet
   redis:
     image: redis
+    volumes:
+        - /mnt/volume_ams3_01:/data
     networks:
       - webnet
 networks:
   webnet:
 secrets:
    secret:
+     external: true
+   ssl_key_path:
+     external: true
+   ssl_cert_path:
      external: true
