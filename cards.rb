@@ -11,6 +11,7 @@ require "jwt"
 before do
   pass if request.path_info == "/login"
   pass if request.path_info == "/styles.css"
+  pass if request.path_info == "/favicon.ico"
 
   if current_user_id.nil?
     redirect("/login")
