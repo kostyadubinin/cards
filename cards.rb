@@ -8,17 +8,12 @@ require "jwt"
 
 # TODO: Handle CSRF.
 # TODO: Don't log tokens.
-before do
-  pass if request.path_info == "/login"
-  pass if request.path_info == "/styles.css"
-  pass if request.path_info == "/favicon.ico"
-
-  if current_user_id.nil?
-    redirect("/login")
-  end
-end
 
 helpers do
+  def authenticate!
+    redirect to("/login") if current_user_id.nil?
+  end
+
   def secret
     @secret ||= File.read(ENV["SECRET"])
   end
@@ -52,10 +47,12 @@ get "/styles.css" do
 end
 
 get "/cards/new" do
+  authenticate!
   erb :new
 end
 
 get "/" do
+  authenticate!
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
@@ -68,6 +65,7 @@ get "/" do
 end
 
 get "/cards" do
+  authenticate!
   card_ids = redis.zrevrange("user:#{current_user_id}:cards", 0, -1)
   current_card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
@@ -81,11 +79,13 @@ get "/cards" do
 end
 
 get "/cards/random" do
+  authenticate!
   id = redis.srandmember("user:#{current_user_id}:current-cards")
   redirect to("/cards/#{id}")
 end
 
 get "/cards/:id" do
+  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -98,6 +98,7 @@ get "/cards/:id" do
 end
 
 get "/cards/:id/edit" do
+  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -110,6 +111,7 @@ get "/cards/:id/edit" do
 end
 
 patch "/cards/:id" do
+  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -119,6 +121,7 @@ patch "/cards/:id" do
 end
 
 post "/current-cards" do
+  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -128,6 +131,7 @@ post "/current-cards" do
 end
 
 delete "/current-cards/:id" do
+  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -137,6 +141,7 @@ delete "/current-cards/:id" do
 end
 
 post "/cards" do
+  authenticate!
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
   redis.zadd("user:#{current_user_id}:cards", Time.now.to_i, id)
@@ -144,6 +149,7 @@ post "/cards" do
 end
 
 delete "/cards/:id" do
+  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
