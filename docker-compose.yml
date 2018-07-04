@@ -14,7 +14,7 @@ services:
       - ssl_cert_path
     image: kostyadubinin/cards
     ports:
-      - "80:9292"
+      - "443:9292"
     networks:
       - webnet
   redis:
