@@ -6,15 +6,11 @@ services:
       APP_ENV: production
       REDIS_HOST: redis
       SECRET: /run/secrets/secret
-      SSL_KEY_PATH: /run/secrets/ssl_key_path
-      SSL_CERT_PATH: /run/secrets/ssl_cert_path
     secrets:
       - secret
-      - ssl_key_path
-      - ssl_cert_path
     image: kostyadubinin/cards
     ports:
-      - "443:9292"
+      - "80:9292"
     networks:
       - webnet
   redis:
@@ -27,8 +23,4 @@ networks:
   webnet:
 secrets:
    secret:
-     external: true
-   ssl_key_path:
-     external: true
-   ssl_cert_path:
      external: true
