@@ -10,6 +10,8 @@ services:
     secrets:
       - site.key
       - site.crt
+    volumes:
+      - /mnt/volume_ams3_01/nginx.conf:/etc/nginx/nginx.conf
   web:
     environment:
       RACK_ENV: none
