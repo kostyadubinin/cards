@@ -1,5 +1,11 @@
 version: "3.2"
 services:
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    networks:
+      - webnet
   web:
     environment:
       RACK_ENV: none
@@ -10,7 +16,7 @@ services:
       - secret
     image: kostyadubinin/cards
     ports:
-      - "80:9292"
+      - "9292:9292"
     networks:
       - webnet
   redis:
