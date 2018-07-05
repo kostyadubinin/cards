@@ -6,12 +6,9 @@ services:
       - "80:80"
     networks:
       - webnet
-    environment:
-      SSL_KEY_PATH: /run/secrets/ssl_key_path
-      SSL_CERT_PATH: /run/secrets/ssl_cert_path
     secrets:
-      - ssl_key_path
-      - ssl_cert_path
+      - site.key
+      - site.crt
   web:
     environment:
       RACK_ENV: none
@@ -36,7 +33,7 @@ networks:
 secrets:
    secret:
      external: true
-   ssl_key_path:
+   site.key:
      external: true
-   ssl_cert_path:
+   site.crt:
      external: true
