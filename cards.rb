@@ -28,7 +28,6 @@ helpers do
 
   def current_user_id
     token = cookies[:token]
-    logger.info({ token: token }.to_json)
 
     unless token.nil?
       decoded_token = begin
