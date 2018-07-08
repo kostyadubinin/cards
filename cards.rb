@@ -169,6 +169,7 @@ post "/login" do
   user_id = redis.hget("users", params[:email])
 
   if !user_id.nil?
+    # TODO: Set expiration.
     token = JWT.encode({ uid: user_id }, secret, "HS256")
     logger.info({ token: token }.to_json)
   else
