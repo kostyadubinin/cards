@@ -182,6 +182,7 @@ post "/login" do
   # TODO: Set expiration.
   token = JWT.encode({ uid: user_id, type: "auth" }, secret_base, "HS256")
   logger.info({ token: token }.to_json)
+  redis.hset("login-history", user_id, Time.now.to_i)
 
   redirect to("/")
 end
