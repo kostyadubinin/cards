@@ -166,14 +166,15 @@ get "/login" do
 end
 
 post "/login" do
-  user_id = redis.hget("users", params[:email])
+  email = params[:email].downcase
+  user_id = redis.hget("users", email)
 
   if !user_id.nil?
     # TODO: Set expiration.
     token = JWT.encode({ uid: user_id }, secret, "HS256")
     logger.info({ token: token }.to_json)
   else
-    logger.info({ error: "emailDoesNotExist", email: params[:email] }.to_json)
+    logger.info({ error: "emailDoesNotExist", email: email }.to_json)
   end
 
   redirect to("/")
