@@ -31,11 +31,20 @@ helpers do
     logger.info({ token: token }.to_json)
 
     unless token.nil?
-      decoded_token = JWT.decode(token, secret_base, true, { algorithm: "HS256" })
-      logger.info({ decodedToken: decoded_token }.to_json)
-      if decoded_token[0]["type"] == "auth"
-        uid = decoded_token[0]["uid"]
-        user_id = uid if redis.exists("user:#{uid}")
+      decoded_token = begin
+                        JWT.decode(token, secret_base, true, { algorithm: "HS256" })
+                      rescue JWT::ExpiredSignature
+                        cookies.delete(:token)
+                        logger.info({ error: "tokenHasExpired" }.to_json)
+                        nil
+                      end
+
+      unless decoded_token.nil?
+        logger.info({ decodedToken: decoded_token }.to_json)
+        if decoded_token[0]["type"] == "auth"
+          uid = decoded_token[0]["uid"]
+          user_id = uid if redis.exists("user:#{uid}")
+        end
       end
     end
 
@@ -179,8 +188,8 @@ post "/login" do
     redis.hset("users", email, id)
   end
 
-  # TODO: Set expiration.
-  token = JWT.encode({ uid: user_id, type: "auth" }, secret_base, "HS256")
+  exp = Time.now.to_i + 30 * 24 * 3600 # 30 days
+  token = JWT.encode({ uid: user_id, type: "auth", exp: exp }, secret_base, "HS256")
   logger.info({ token: token }.to_json)
   redis.hset("login-history", user_id, Time.now.to_i)
 
