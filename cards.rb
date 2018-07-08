@@ -145,6 +145,7 @@ post "/cards" do
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
   redis.zadd("user:#{current_user_id}:cards", Time.now.to_i, id)
+  redis.sadd("user:#{current_user_id}:current-cards", id)
   redirect to("/cards")
 end
 
