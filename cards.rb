@@ -33,8 +33,10 @@ helpers do
     unless token.nil?
       decoded_token = JWT.decode(token, secret_base, true, { algorithm: "HS256" })
       logger.info({ decodedToken: decoded_token }.to_json)
-      uid = decoded_token[0]["uid"]
-      user_id = uid if redis.exists("user:#{uid}")
+      if decoded_token[0]["type"] == "auth"
+        uid = decoded_token[0]["uid"]
+        user_id = uid if redis.exists("user:#{uid}")
+      end
     end
 
     logger.info({ currentUserId: user_id }.to_json)
@@ -178,7 +180,7 @@ post "/login" do
   end
 
   # TODO: Set expiration.
-  token = JWT.encode({ uid: user_id }, secret_base, "HS256")
+  token = JWT.encode({ uid: user_id, type: "auth" }, secret_base, "HS256")
   logger.info({ token: token }.to_json)
 
   redirect to("/")
