@@ -14,7 +14,7 @@ helpers do
     redirect to("/login") if current_user_id.nil?
   end
 
-  def secret
+  def secret_base
     @secret ||= File.read(ENV["SECRET"])
   end
 
@@ -31,7 +31,7 @@ helpers do
     logger.info({ token: token }.to_json)
 
     unless token.nil?
-      decoded_token = JWT.decode(token, secret, true, { algorithm: "HS256" })
+      decoded_token = JWT.decode(token, secret_base, true, { algorithm: "HS256" })
       logger.info({ decodedToken: decoded_token }.to_json)
       uid = decoded_token[0]["uid"]
       user_id = uid if redis.exists("user:#{uid}")
@@ -169,13 +169,16 @@ post "/login" do
   email = params[:email].downcase
   user_id = redis.hget("users", email)
 
-  if !user_id.nil?
-    # TODO: Set expiration.
-    token = JWT.encode({ uid: user_id }, secret, "HS256")
-    logger.info({ token: token }.to_json)
-  else
-    logger.info({ error: "emailDoesNotExist", email: email }.to_json)
+  if user_id.nil?
+    # create a user
+    id = redis.incr(:next_user_id)
+    redis.hset("user:#{id}", :email, email)
+    redis.hset("users", email, id)
   end
+
+  # TODO: Set expiration.
+  token = JWT.encode({ uid: user_id }, secret_base, "HS256")
+  logger.info({ token: token }.to_json)
 
   redirect to("/")
 end
