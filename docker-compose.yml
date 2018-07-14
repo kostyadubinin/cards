@@ -17,9 +17,6 @@ services:
       RACK_ENV: none
       APP_ENV: production
       REDIS_HOST: redis
-      SECRET: /run/secrets/secret
-    secrets:
-      - secret
     image: kostyadubinin/cards
     ports:
       - "9292:9292"

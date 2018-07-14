@@ -1,54 +1,27 @@
 require "sinatra"
-require "sinatra/cookies"
 require "sinatra/content_for"
 require "sinatra/reloader" if development?
 require "pry" if development?
 require "redis"
-require "jwt"
 
 # TODO: Handle CSRF.
 # TODO: Don't log tokens.
 
+use Rack::Auth::Basic, "Restricted Area" do |username, password|
+  username == 'admin' and password == 'admin'
+end
+
 helpers do
-  def authenticate!
-    redirect to("/login") if current_user_id.nil?
-  end
-
-  def secret_base
-    @secret ||= File.read(ENV["SECRET"])
-  end
-
   def redis
     @_redis ||= Redis.new(host: ENV["REDIS_HOST"])
   end
 
   def current_user_email
-    @_current_user_email ||= redis.hget("user:#{current_user_id}", :email)
+    "test@example.com"
   end
 
   def current_user_id
-    token = cookies[:token]
-
-    unless token.nil?
-      decoded_token = begin
-                        JWT.decode(token, secret_base, true, { algorithm: "HS256" })
-                      rescue JWT::ExpiredSignature
-                        cookies.delete(:token)
-                        logger.info({ error: "tokenHasExpired" }.to_json)
-                        nil
-                      end
-
-      unless decoded_token.nil?
-        logger.info({ decodedToken: decoded_token }.to_json)
-        if decoded_token[0]["type"] == "auth"
-          uid = decoded_token[0]["uid"]
-          user_id = uid if redis.exists("user:#{uid}")
-        end
-      end
-    end
-
-    logger.info({ currentUserId: user_id }.to_json)
-    user_id
+    1
   end
 end
 
@@ -57,12 +30,10 @@ get "/styles.css" do
 end
 
 get "/cards/new" do
-  authenticate!
   erb :new
 end
 
 get "/" do
-  authenticate!
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
@@ -75,7 +46,6 @@ get "/" do
 end
 
 get "/cards" do
-  authenticate!
   card_ids = redis.zrevrange("user:#{current_user_id}:cards", 0, -1)
   current_card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
@@ -89,13 +59,11 @@ get "/cards" do
 end
 
 get "/cards/random" do
-  authenticate!
   id = redis.srandmember("user:#{current_user_id}:current-cards")
   redirect to("/cards/#{id}")
 end
 
 get "/cards/:id" do
-  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -108,7 +76,6 @@ get "/cards/:id" do
 end
 
 get "/cards/:id/edit" do
-  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -121,7 +88,6 @@ get "/cards/:id/edit" do
 end
 
 patch "/cards/:id" do
-  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -131,7 +97,6 @@ patch "/cards/:id" do
 end
 
 post "/current-cards" do
-  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -141,7 +106,6 @@ post "/current-cards" do
 end
 
 delete "/current-cards/:id" do
-  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -151,7 +115,6 @@ delete "/current-cards/:id" do
 end
 
 post "/cards" do
-  authenticate!
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
   redis.zadd("user:#{current_user_id}:cards", Time.now.to_i, id)
@@ -160,7 +123,6 @@ post "/cards" do
 end
 
 delete "/cards/:id" do
-  authenticate!
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -169,33 +131,4 @@ delete "/cards/:id" do
   redis.srem("user:#{current_user_id}:current-cards", params[:id])
   redis.del("card:#{params[:id]}")
   redirect to("/cards")
-end
-
-get "/login" do
-  redirect to("/") if !current_user_id.nil?
-  erb :login
-end
-
-post "/login" do
-  email = params[:email].downcase
-  user_id = redis.hget("users", email)
-
-  if user_id.nil?
-    # create a user
-    id = redis.incr(:next_user_id)
-    redis.hset("user:#{id}", :email, email)
-    redis.hset("users", email, id)
-  end
-
-  exp = Time.now.to_i + 30 * 24 * 3600 # 30 days
-  token = JWT.encode({ uid: user_id, type: "auth", exp: exp }, secret_base, "HS256")
-  logger.info({ token: token }.to_json)
-  redis.hset("login-history", user_id, Time.now.to_i)
-
-  redirect to("/")
-end
-
-delete "/logout" do
-  cookies.delete(:token)
-  redirect to("/")
 end
