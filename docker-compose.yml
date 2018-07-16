@@ -16,7 +16,7 @@ services:
     secrets:
       - password
     environment:
-      PASSWORD_PATH: /run/secrets/password
+      PASSWORD_PATH: "/run/secrets/password"
       RACK_ENV: none
       APP_ENV: production
       REDIS_HOST: redis

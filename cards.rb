@@ -8,7 +8,6 @@ require "redis"
 # TODO: Don't log tokens.
 
 use Rack::Auth::Basic, "Restricted Area" do |username, password|
-  logger.info("password path: #{ENV['PASSWORD_PATH'].inspect}")
   username == "admin" and password == File.read(ENV["PASSWORD_PATH"])
 end
 
