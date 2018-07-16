@@ -8,7 +8,7 @@ require "redis"
 # TODO: Don't log tokens.
 
 use Rack::Auth::Basic, "Restricted Area" do |username, password|
-  username == 'admin' and password == 'admin'
+  username == "admin" and password == ENV["PASSWORD"]
 end
 
 helpers do
