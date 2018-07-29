@@ -8,13 +8,13 @@ Home | Cards
 
 <ol>
   <% @cards.each do |card| %>
-    <% if params[:flip] == card[:id] %>
-      <% href = "/" %>
-      <% text = card[:back] %>
-    <% else %>
-      <% href = "/?flip=#{card[:id]}" %>
-      <% text = card[:middle] %>
-    <% end %>
+  <% if params[:flip] == card[:id] %>
+  <% href = "/" %>
+  <% text = card[:back] %>
+  <% else %>
+  <% href = "/?flip=#{card[:id]}" %>
+  <% text = card[:middle] %>
+  <% end %>
   <li>
     <form action="/current-cards/<%= card[:id] %>" method="post" style="display: inline">
       <input type="hidden" name="_method" value="delete">
