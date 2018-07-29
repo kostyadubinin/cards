@@ -6,7 +6,6 @@ require "redis"
 require "bcrypt"
 
 # TODO: Handle CSRF.
-# TODO: Don't log tokens.
 
 use Rack::Auth::Basic, "Test test" do |username, password|
   username == "admin" && BCrypt::Password.new(File.read(ENV["PASSWORD_PATH"])) == password
