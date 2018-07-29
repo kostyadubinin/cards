@@ -3,12 +3,13 @@ require "sinatra/content_for"
 require "sinatra/reloader" if development?
 require "pry" if development?
 require "redis"
+require "bcrypt"
 
 # TODO: Handle CSRF.
 # TODO: Don't log tokens.
 
-use Rack::Auth::Basic, "Restricted Area" do |username, password|
-  username == "admin" and password == File.read(ENV["PASSWORD_PATH"])
+use Rack::Auth::Basic, "Test test" do |username, password|
+  username == "admin" && BCrypt::Password.new(File.read(ENV["PASSWORD_PATH"])) == password
 end
 
 helpers do
