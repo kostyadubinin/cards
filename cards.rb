@@ -6,6 +6,9 @@ require "redis"
 require "bcrypt"
 require "rest-client"
 
+enable :sessions
+set :session_secret, File.read(ENV["SESSION_SECRET_PATH"])
+
 # TODO: Handle CSRF.
 
 use Rack::Auth::Basic, "Test test" do |username, password|
@@ -31,6 +34,7 @@ get "/cards/new" do
 end
 
 get "/" do
+  binding.pry
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
