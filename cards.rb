@@ -11,10 +11,6 @@ set :session_secret, File.read(ENV["SESSION_SECRET_PATH"])
 
 # TODO: Handle CSRF.
 
-use Rack::Auth::Basic, "Test test" do |username, password|
-  username == "admin" && BCrypt::Password.new(File.read(ENV["PASSWORD_PATH"])) == password
-end
-
 helpers do
   def redis
     @_redis ||= Redis.new(host: ENV["REDIS_HOST"])
@@ -23,6 +19,12 @@ helpers do
   def current_user_id
     redis.hget(:users, session[:uid])
   end
+
+  def require_login
+    if current_user_id.nil?
+      redirect to("https://learnaword.eu.auth0.com/authorize/?response_type=code&client_id=JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm&redirect_uri=http:%2F%2F0.0.0.0:9292%2Fcallback&scope=openid")
+    end
+  end
 end
 
 get "/styles.css" do
@@ -30,10 +32,14 @@ get "/styles.css" do
 end
 
 get "/cards/new" do
+  require_login
+
   erb :new
 end
 
 get "/" do
+  require_login
+
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
@@ -46,6 +52,8 @@ get "/" do
 end
 
 get "/cards" do
+  require_login
+
   card_ids = redis.zrevrange("user:#{current_user_id}:cards", 0, -1)
   current_card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
@@ -59,11 +67,15 @@ get "/cards" do
 end
 
 get "/cards/random" do
+  require_login
+
   id = redis.srandmember("user:#{current_user_id}:current-cards")
   redirect to("/cards/#{id}")
 end
 
 get "/cards/:id" do
+  require_login
+
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -76,6 +88,8 @@ get "/cards/:id" do
 end
 
 get "/cards/:id/edit" do
+  require_login
+
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -88,6 +102,8 @@ get "/cards/:id/edit" do
 end
 
 patch "/cards/:id" do
+  require_login
+
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -97,6 +113,8 @@ patch "/cards/:id" do
 end
 
 post "/current-cards" do
+  require_login
+
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -106,6 +124,8 @@ post "/current-cards" do
 end
 
 delete "/current-cards/:id" do
+  require_login
+
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -115,6 +135,8 @@ delete "/current-cards/:id" do
 end
 
 post "/cards" do
+  require_login
+
   id = redis.incr(:next_card_id)
   redis.hmset("card:#{id}", "front", params[:front], "back", params[:back])
   redis.zadd("user:#{current_user_id}:cards", Time.now.to_i, id)
@@ -123,6 +145,8 @@ post "/cards" do
 end
 
 delete "/cards/:id" do
+  require_login
+
   unless redis.zrank("user:#{current_user_id}:cards", params[:id])
     halt "Card not found"
   end
@@ -149,5 +173,10 @@ get "/callback" do
   body = JSON.parse(response.body)
 
   session[:uid] = body["sub"]
+  redirect to("/")
+end
+
+post "/logout" do
+  session[:uid].clear
   redirect to("/")
 end
