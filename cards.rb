@@ -34,7 +34,6 @@ get "/cards/new" do
 end
 
 get "/" do
-  binding.pry
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
