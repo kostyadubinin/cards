@@ -132,3 +132,22 @@ delete "/cards/:id" do
   redis.del("card:#{params[:id]}")
   redirect to("/cards")
 end
+
+get "/callback" do
+  payload = {
+    grant_type: "authorization_code",
+    client_id: "JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm",
+    client_secret: File.read(ENV["AUTH0_CLIENT_SECRET_PATH"]),
+    code: params[:code],
+    redirect_uri: to("/callback")
+  }
+
+  response = RestClient.post("https://learnaword.eu.auth0.com/oauth/token", payload.to_json, "Content-Type" => "application/json")
+  body = JSON.parse(response.body)
+
+  response = RestClient.get("https://learnaword.eu.auth0.com/userinfo", "Authorization" => "Bearer #{body['access_token']}")
+  body = JSON.parse(response.body)
+
+  session[:uid] = body["sub"]
+  redirect to("/")
+end
