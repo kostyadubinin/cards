@@ -6,6 +6,8 @@ require "redis"
 require "bcrypt"
 require "rest-client"
 
+REDIRECT_URI = CGI.escape("https://learnaword.net/callback")
+
 enable :sessions
 set :session_secret, File.read(ENV["SESSION_SECRET_PATH"])
 
@@ -22,8 +24,7 @@ helpers do
 
   def require_login
     if current_user_id.nil?
-      redirect_uri = CGI.escape("https://learnaword.net/callback")
-      redirect to("https://learnaword.eu.auth0.com/authorize/?response_type=code&client_id=JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm&redirect_uri=#{redirect_uri}&scope=openid")
+      redirect to("https://learnaword.eu.auth0.com/authorize/?response_type=code&client_id=JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm&redirect_uri=#{REDIRECT_URI}&scope=openid")
     end
   end
 end
@@ -164,7 +165,7 @@ get "/callback" do
     client_id: "JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm",
     client_secret: File.read(ENV["AUTH0_CLIENT_SECRET_PATH"]),
     code: params[:code],
-    redirect_uri: to("/callback")
+    redirect_uri: REDIRECT_URI
   }
 
   logger.info(params.inspect)
