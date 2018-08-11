@@ -21,7 +21,7 @@ helpers do
   end
 
   def current_user_id
-    1
+    redis.hget(:users, session[:uid])
   end
 end
 
