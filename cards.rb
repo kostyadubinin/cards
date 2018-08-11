@@ -167,6 +167,8 @@ get "/callback" do
     redirect_uri: to("/callback")
   }
 
+  logger.info(params.inspect)
+
   response = RestClient.post("https://learnaword.eu.auth0.com/oauth/token", payload.to_json, "Content-Type" => "application/json")
   body = JSON.parse(response.body)
 
