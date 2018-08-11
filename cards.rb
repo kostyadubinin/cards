@@ -22,7 +22,8 @@ helpers do
 
   def require_login
     if current_user_id.nil?
-      redirect to("https://learnaword.eu.auth0.com/authorize/?response_type=code&client_id=JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm&redirect_uri=http:%2F%2F0.0.0.0:9292%2Fcallback&scope=openid")
+      redirect_uri = CGI.escape(to("/callback"))
+      redirect to("https://learnaword.eu.auth0.com/authorize/?response_type=code&client_id=JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm&redirect_uri=#{redirect_uri}&scope=openid")
     end
   end
 end
