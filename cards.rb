@@ -17,10 +17,6 @@ helpers do
     @_redis ||= Redis.new(host: ENV["REDIS_HOST"])
   end
 
-  def current_user_email
-    "test@example.com"
-  end
-
   def current_user_id
     1
   end
