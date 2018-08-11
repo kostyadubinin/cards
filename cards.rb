@@ -4,6 +4,7 @@ require "sinatra/reloader" if development?
 require "pry" if development?
 require "redis"
 require "bcrypt"
+require "rest-client"
 
 # TODO: Handle CSRF.
 
