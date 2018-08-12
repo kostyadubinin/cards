@@ -5,6 +5,13 @@ require "pry" if development?
 require "redis"
 require "bcrypt"
 require "rest-client"
+require "raven"
+
+Raven.configure do |config|
+  config.dsn = 'https://329136ad78ee45cdb3af07820e508dc5:5e52863787084b3b98cbdca70fb43fdc@sentry.io/1260976'
+end
+
+use Raven::Rack
 
 REDIRECT_URI = CGI.escape("https://learnaword.net/callback")
 
