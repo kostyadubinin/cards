@@ -79,7 +79,9 @@ get "/cards/random" do
   require_login
 
   id = redis.srandmember("user:#{current_user_id}:current-cards")
-  redirect to("/cards/#{id}")
+  url = to("/cards/#{id}")
+  logger.info("Redirecting to: #{url.inspect}")
+  redirect url
 end
 
 get "/cards/:id" do
