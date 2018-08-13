@@ -13,7 +13,7 @@ end
 
 use Raven::Rack
 
-REDIRECT_URI = CGI.escape("https://learnaword.net/callback")
+REDIRECT_URI = "https://learnaword.net/callback"
 
 enable :sessions
 set :session_secret, File.read(ENV["SESSION_SECRET_PATH"])
@@ -175,15 +175,13 @@ get "/callback" do
     redirect_uri: REDIRECT_URI
   }
 
-  logger.info(params.inspect)
+  response = RestClient.post("https://learnaword.eu.auth0.com/oauth/token", payload.to_json, "Content-Type" => "application/json")
+  body = JSON.parse(response.body)
 
-  # response = RestClient.post("https://learnaword.eu.auth0.com/oauth/token", payload.to_json, "Content-Type" => "application/json")
-  # body = JSON.parse(response.body)
+  response = RestClient.get("https://learnaword.eu.auth0.com/userinfo", "Authorization" => "Bearer #{body['access_token']}")
+  body = JSON.parse(response.body)
 
-  # response = RestClient.get("https://learnaword.eu.auth0.com/userinfo", "Authorization" => "Bearer #{body['access_token']}")
-  # body = JSON.parse(response.body)
-
-  # session[:uid] = body["sub"]
+  session[:uid] = body["sub"]
   redirect to("/")
 end
 
