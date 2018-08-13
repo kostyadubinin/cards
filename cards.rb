@@ -199,6 +199,6 @@ get "/callback" do
 end
 
 post "/logout" do
-  session[:uid].clear
+  session[:uid]&.clear
   redirect to("/")
 end
