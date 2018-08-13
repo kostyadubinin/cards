@@ -13,8 +13,6 @@ end
 
 use Raven::Rack
 
-REDIRECT_URI = "https://learnaword.net/callback"
-
 enable :sessions
 set :session_secret, File.read(ENV["SESSION_SECRET_PATH"])
 
@@ -31,7 +29,15 @@ helpers do
 
   def require_login
     if current_user_id.nil?
-      redirect to("https://learnaword.eu.auth0.com/authorize/?response_type=code&client_id=JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm&redirect_uri=#{REDIRECT_URI}&scope=openid")
+      redirect to("https://learnaword.eu.auth0.com/authorize/?response_type=code&client_id=JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm&redirect_uri=#{redirect_uri}&scope=openid")
+    end
+  end
+
+  def redirect_uri
+    if settings.production?
+      "https://learnaword.net/callback"
+    else
+      to("callback")
     end
   end
 end
@@ -174,7 +180,7 @@ get "/callback" do
     client_id: "JlceY3aJuhEB06gtZMdbyKOO0R8fBwMm",
     client_secret: File.read(ENV["AUTH0_CLIENT_SECRET_PATH"]),
     code: params[:code],
-    redirect_uri: REDIRECT_URI
+    redirect_uri: redirect_uri
   }
 
   response = RestClient.post("https://learnaword.eu.auth0.com/oauth/token", payload.to_json, "Content-Type" => "application/json")
