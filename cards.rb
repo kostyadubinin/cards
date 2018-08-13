@@ -189,6 +189,11 @@ get "/callback" do
   response = RestClient.get("https://learnaword.eu.auth0.com/userinfo", "Authorization" => "Bearer #{body['access_token']}")
   body = JSON.parse(response.body)
 
+  unless redis.hexists(:users, body["sub"])
+    id = redis.incr(:next_user_id)
+    redis.hset(:users, body["sub"], id)
+  end
+
   session[:uid] = body["sub"]
   redirect to("/")
 end
