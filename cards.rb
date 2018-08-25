@@ -86,11 +86,9 @@ end
 
 get "/cards/random" do
   require_login
-
   id = redis.srandmember("user:#{current_user_id}:current-cards")
-  url = to("/cards/#{id}")
-  logger.info("Redirecting to: #{url.inspect}")
-  redirect url
+  redirect to("/cards/#{id}") unless id.nil?
+  erb :random
 end
 
 get "/cards/:id" do
