@@ -8,22 +8,12 @@ Manage | Cards
 
 <ol>
   <% @cards.each do |card| %>
-    <% if params[:flip] == card[:id] %>
-      <% href = "/cards" %>
-      <% text = card[:back] %>
-    <% else %>
-      <% href = "/cards?flip=#{card[:id]}" %>
-      <% text = card[:middle] %>
-    <% end %>
     <li>
       <form action="/current-cards" method="post" style="display: inline">
 	<input type="hidden" name="id" value="<%= card[:id] %>">
-	<input type="submit"<%= 'disabled="disabled"' if card[:current] %> value="Learn">
+	<input type="submit"<%= 'disabled="disabled"' if card[:current] %> value="Add">
       </form>
-      <form action="/cards/<%= card[:id] %>" method="get" style="display: inline">
-	<input value="Open" type="submit">
-      </form>
-      <a href=<%= href %>><%= text %></a>
+      <a href="/cards/<%= card[:id] %>"><%= card[:middle] %></a>
     </li>
   <% end %>
 </ol>
