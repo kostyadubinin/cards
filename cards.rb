@@ -98,9 +98,11 @@ get "/cards/:id" do
     halt "Card not found"
   end
 
+  current = redis.sismember("user:#{current_user_id}:current-cards", params[:id])
+
   card = redis.hgetall("card:#{params[:id]}")
   left, middle, right = card["front"].split("*")
-  @card = { id: params[:id], left: left, middle: middle, right: right, back: card["back"] }
+  @card = { id: params[:id], left: left, middle: middle, right: right, back: card["back"], current: current }
 
   erb :card
 end
@@ -138,7 +140,7 @@ post "/current-cards" do
   end
 
   redis.sadd("user:#{current_user_id}:current-cards", params[:id])
-  redirect to("/cards")
+  redirect back
 end
 
 delete "/current-cards/:id" do
@@ -149,7 +151,7 @@ delete "/current-cards/:id" do
   end
 
   redis.srem("user:#{current_user_id}:current-cards", params[:id])
-  redirect to("/")
+  redirect back
 end
 
 post "/cards" do
