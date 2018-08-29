@@ -1,9 +1,3 @@
-<% random_card_path = if wild_random? %>
-  <% to("/cards/random") %>
-<% else %>
-  <% to("/cards/current/random") %>
-<% end %>
-
 <% logger.info(random_card_path.inspect) %>
 
 <a href="/">Home</a> |

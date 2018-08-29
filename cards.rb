@@ -22,6 +22,14 @@ set :session_secret, File.read(ENV["SESSION_SECRET_PATH"])
 # TODO: Handle CSRF.
 
 helpers do
+  def random_card_path
+    if wild_random?
+      to("/cards/random")
+    else
+      to("/cards/current/random")
+    end
+  end
+
   def wild_random?
     session[:random] == "allcards"
   end
