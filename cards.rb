@@ -22,6 +22,10 @@ set :session_secret, File.read(ENV["SESSION_SECRET_PATH"])
 # TODO: Handle CSRF.
 
 helpers do
+  def wild_random?
+    session[:random] == "allcards"
+  end
+
   def redis
     @_redis ||= Redis.new(host: ENV["REDIS_HOST"])
   end
@@ -47,6 +51,24 @@ end
 
 get "/styles.css" do
   scss :styles
+end
+
+get "/settings" do
+  require_login
+  erb :settings
+end
+
+post "/random" do
+  require_login
+  if params[:random] == "allcards"
+    session[:random] = "allcards"
+  elsif params[:random] == "deckonly"
+    session[:random]&.clear
+  else
+    halt 422, "Wrong parameters"
+  end
+
+  redirect to("/settings")
 end
 
 get "/cards/new" do
@@ -84,9 +106,19 @@ get "/cards" do
   erb :cards
 end
 
-get "/cards/random" do
+get "/cards/current/random" do
   require_login
   id = redis.srandmember("user:#{current_user_id}:current-cards")
+  redirect to("/cards/#{id}") unless id.nil?
+  erb :random
+end
+
+get "/cards/random" do
+  require_login
+  current_card_ids = redis.smembers("user:#{current_user_id}:current-cards")
+  all_card_ids = redis.zrange("user:#{current_user_id}:cards", 0, -1)
+  card_ids = all_card_ids - current_card_ids
+  id = card_ids.sample
   redirect to("/cards/#{id}") unless id.nil?
   erb :random
 end

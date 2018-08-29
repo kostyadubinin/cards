@@ -1,4 +1,14 @@
-<a href="/">Home</a> | <a href="/cards/random">Random</a> | <a href="/cards/new">New card</a> | <a href="/cards">All cards</a>
+<% random_card_path = if wild_random? %>
+  <% to("/cards/random") %>
+<% else %>
+  <% to("/cards/current/random") %>
+<% end %>
+
+<a href="/">Home</a> |
+<a href="<%= random_card_path %>">Random</a> |
+<a href="/cards/new">New card</a> |
+<a href="/cards">All cards</a> |
+<a href="/settings">Settings</a>
 
 <form action="/logout" method="post" style="display: inline; float: right">
   <input value="Log Out" type="submit">

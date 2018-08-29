@@ -1,0 +1,24 @@
+<% content_for(:title) do %>
+Settings | Cards
+<% end %>
+
+<%= erb :header %>
+
+<h1>Settings</h1>
+
+<form action="/random" method="post">
+  <fieldset>
+    <legend>Which cards to use whey you click the "Random" button?</legend>
+    <ul>
+      <li>
+      <label for="deckonly">learning deck only</label>
+      <input type="radio" id="deckonly" name="random" value="deckonly"<%= "checked" unless wild_random? %>/>
+      </li>
+      <li>
+      <label for="allcards">all</label>
+      <input type="radio" id="allcards" name="random" value="allcards" <%= "checked" if wild_random? %>/>
+      </li>
+    </ul>
+  </fieldset>
+  <p><input value="Save" type="submit"></p>
+</form>
