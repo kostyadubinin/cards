@@ -62,6 +62,7 @@ get "/styles.css" do
 end
 
 get "/about" do
+  require_login
   erb :about
 end
 
