@@ -61,6 +61,10 @@ get "/styles.css" do
   scss :styles
 end
 
+get "/about" do
+  erb :about
+end
+
 get "/settings" do
   require_login
   erb :settings
@@ -241,7 +245,7 @@ get "/callback" do
   redirect to("/")
 end
 
-post "/logout" do
+get "/logout" do
   session[:uid]&.clear
   redirect to("/")
 end
