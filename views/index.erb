@@ -3,28 +3,17 @@ Home | Cards
 <% end %>
 
 <%= erb :header %>
-<%= erb :subheader %>
 
-<h1>Learning deck</h1>
+<h1>Welcome</h1>
 
-<ol>
-  <% @cards.each do |card| %>
-  <% if params[:flip] == card[:id] %>
-  <% href = "/" %>
-  <% text = card[:back] %>
-  <% else %>
-  <% href = "/?flip=#{card[:id]}" %>
-  <% text = card[:middle] %>
-  <% end %>
-  <li>
-    <form action="/current-cards/<%= card[:id] %>" method="post" style="display: inline">
-      <input type="hidden" name="_method" value="delete">
-      <input value="Remove" type="submit">
-    </form>
-    <form action="/cards/<%= card[:id] %>" method="get" style="display: inline">
-      <input value="Open" type="submit">
-    </form>
-    <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
-  </li>
-  <% end %>
-</ol>
+<nav class="menu">
+  <ul>
+    <li><a href="/deck">Your learning deck</a></li>
+    <li><a href="/cards">All your cards</a></li>
+  </ul>
+</nav>
+
+<p><i>The deck</i> lists cards you are currently learning. You can add and
+remove cards from the deck. Too see all your cards go to <i>All cards</i>.</p>
+
+<p>Enjoy learning!</p>

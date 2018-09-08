@@ -1,0 +1,29 @@
+<% content_for(:title) do %>
+Learning Deck | Learn a Word
+<% end %>
+
+<%= erb :header %>
+
+<h1>Your learning deck</h1>
+
+<ol>
+  <% @cards.each do |card| %>
+  <% if params[:flip] == card[:id] %>
+  <% href = "/" %>
+  <% text = card[:back] %>
+  <% else %>
+  <% href = "/?flip=#{card[:id]}" %>
+  <% text = card[:middle] %>
+  <% end %>
+  <li>
+    <form action="/current-cards/<%= card[:id] %>" method="post" style="display: inline">
+      <input type="hidden" name="_method" value="delete">
+      <input value="Remove" type="submit">
+    </form>
+    <form action="/cards/<%= card[:id] %>" method="get" style="display: inline">
+      <input value="Open" type="submit">
+    </form>
+    <%= card[:left] %><a href=<%= href %>><%= text %></a><%= card[:right] %>
+  </li>
+  <% end %>
+</ol>

@@ -3,7 +3,6 @@ New | Cards
 <% end %>
 
 <%= erb :header %>
-<%= erb :subheader %>
 
 <h1>New card</h1>
 
@@ -19,3 +18,26 @@ New | Cards
   <br>
   <input type="submit" value="Create">
 </form>
+
+<h2>Explanation</h2>
+
+<p>Use asterisks (*) inside the <i>front side</i> to wrap a word into a link. If you
+click that link you will see its <i>translation</i>. For example:</p>
+
+<% if params[:example].nil? %>
+<% href = "/cards/new?example=flip" %>
+<% text = "casa" %>
+<% else %>
+<% href = "/cards/new" %>
+<% text = "home" %>
+<% end %>
+
+<p>
+  Front side: Mi *casa* es su casa.
+  <br>
+  Translation: home
+  <br>
+  Result: Mi <a href=<%= href %>><%= text %></a> es su casa.
+</p>
+
+Congratulations! You just learned a new Spanish word, <b>casa</b>.

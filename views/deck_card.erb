@@ -1,0 +1,29 @@
+<% content_for(:title) do %>
+<%= "#{@card[:middle]} | Cards" %>
+<% end %>
+
+<%= erb :header %>
+
+<a href="/">Deck</a> / <%= @card[:middle] %>
+
+<p>Cards in deck: <%= @cards_in_deck %></p>
+
+<hr>
+
+<h1>
+  <% if params.key?(:flip) %>
+  <a href="?"><%= @card[:back] %></a>
+  <% else %>
+  <a href="?flip"><%= @card[:middle] %></a>
+  <% end %>
+</h1>
+
+<p>
+<i><%= @card[:left] %><b><%= @card[:middle] %></b><%= @card[:right] %></i>
+</p>
+
+<p>
+  Look it up in: <a target="_blank" href="https://dictionary.cambridge.org/search/learner-english/direct/?q=<%= @card[:middle] %>">Cambridge Dictionary</a> | <a target="_blank" href="https://translate.google.nl/#auto/ru/<%= @card[:middle] %>">Google Translate</a>
+</p>
+
+<a href="/cards/<%= @card[:id] %>">Go to card</a>

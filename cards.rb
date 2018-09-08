@@ -71,6 +71,36 @@ get "/settings" do
   erb :settings
 end
 
+get "/deck" do
+  require_login
+
+  card_ids = redis.smembers("user:#{current_user_id}:current-cards")
+
+  @cards = card_ids.map do |id|
+    card = redis.hgetall("card:#{id}")
+    left, middle, right = card["front"].split("*")
+    { id: id, left: left, middle: middle, right: right, back: card["back"] }
+  end
+
+  erb :deck
+end
+
+get "/deck/cards/:id" do
+  require_login
+
+  unless redis.sismember("user:#{current_user_id}:current-cards", params[:id])
+    halt "Card not found"
+  end
+
+  card = redis.hgetall("card:#{params[:id]}")
+  left, middle, right = card["front"].split("*")
+  @card = { id: params[:id], left: left, middle: middle, right: right, back: card["back"] }
+
+  @cards_in_deck = redis.scard("user:#{current_user_id}:current-cards")
+
+  erb :deck_card
+end
+
 post "/random" do
   require_login
   if params[:random] == "allcards"
