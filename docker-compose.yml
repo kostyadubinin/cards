@@ -8,8 +8,8 @@ services:
     networks:
       - webnet
     secrets:
-      - site.key
-      - site.crt
+      - www_learnaword_net.key
+      - www_learnaword_net.pem
     volumes:
       - /mnt/volume_ams3_01/nginx.conf:/etc/nginx/nginx.conf
   web:
@@ -44,7 +44,7 @@ secrets:
      external: true
    auth0_client_secret:
      external: true
-   site.key:
+   www_learnaword_net.key:
      external: true
-   site.crt:
+   www_learnaword_net.pem:
      external: true
