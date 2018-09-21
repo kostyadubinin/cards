@@ -1,0 +1,14 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+    - name: test connection
+      ping:
+    - name: copy docker-compose.yml
+      copy:
+        src: docker-compose.yml
+        dest: /root/docker-compose.yml
+    - name: copy nginx.conf
+      copy:
+        src: nginx.conf
+        dest: /mnt/volume_ams3_01
