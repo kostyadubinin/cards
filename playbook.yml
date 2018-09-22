@@ -10,3 +10,5 @@
       copy:
         src: nginx.conf
         dest: /mnt/volume_ams3_01
+    - name: deploy
+      command: docker stack deploy -c docker-compose.yml --with-registry-auth cards
