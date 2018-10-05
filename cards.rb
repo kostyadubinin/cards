@@ -19,8 +19,6 @@ use Raven::Rack
 enable :sessions
 set :session_secret, File.read(ENV["SESSION_SECRET_PATH"])
 
-# TODO: Handle CSRF.
-
 helpers do
   def random_card_path
     if wild_random?
