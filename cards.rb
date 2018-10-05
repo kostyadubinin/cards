@@ -71,7 +71,6 @@ end
 
 get "/deck" do
   require_login
-
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
@@ -95,12 +94,12 @@ get "/deck/cards/:id" do
   @card = { id: params[:id], left: left, middle: middle, right: right, back: card["back"] }
 
   @cards_in_deck = redis.scard("user:#{current_user_id}:current-cards")
-
   erb :deck_card
 end
 
 post "/random" do
   require_login
+
   if params[:random] == "allcards"
     session[:random] = "allcards"
   elsif params[:random] == "deckonly"
@@ -114,13 +113,11 @@ end
 
 get "/cards/new" do
   require_login
-
   erb :new
 end
 
 get "/" do
   require_login
-
   card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
   @cards = card_ids.map do |id|
@@ -134,7 +131,6 @@ end
 
 get "/cards" do
   require_login
-
   card_ids = redis.zrevrange("user:#{current_user_id}:cards", 0, -1)
   current_card_ids = redis.smembers("user:#{current_user_id}:current-cards")
 
@@ -176,7 +172,6 @@ get "/cards/:id" do
   card = redis.hgetall("card:#{params[:id]}")
   left, middle, right = card["front"].split("*")
   @card = { id: params[:id], left: left, middle: middle, right: right, back: card["back"], current: current }
-
   erb :card
 end
 
@@ -190,7 +185,6 @@ get "/cards/:id/edit" do
   card = redis.hgetall("card:#{params[:id]}")
   _, middle, _ = card["front"].split("*")
   @card = { id: params[:id], front: card["front"], back: card["back"], middle: middle }
-
   erb :edit
 end
 
@@ -261,7 +255,6 @@ get "/callback" do
 
   response = RestClient.post("https://learnaword.eu.auth0.com/oauth/token", payload.to_json, "Content-Type" => "application/json")
   body = JSON.parse(response.body)
-
   response = RestClient.get("https://learnaword.eu.auth0.com/userinfo", "Authorization" => "Bearer #{body['access_token']}")
   body = JSON.parse(response.body)
 
