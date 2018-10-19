@@ -1,4 +1,5 @@
 require "sinatra"
+require "appsignal/integrations/sinatra"
 require "sinatra/content_for"
 require "sinatra/reloader" if development?
 require "pry" if development?
