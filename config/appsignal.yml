@@ -1,0 +1,11 @@
+default: &defaults
+  push_api_key: "<%= File.read(ENV["APPSIGNAL_PUSH_API_KEY"]) %>"
+  name: "Cards"
+
+development:
+  <<: *defaults
+  push_api_key: ""
+
+production:
+  <<: *defaults
+  active: true
